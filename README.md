@@ -1,8 +1,8 @@
-# ⬡ NexusHub — Data Marketplace for AI Agents
+# NexusHub - Data Marketplace for AI Agents
 
-> Structured, real-world data. No API keys. No signups. No contracts. Just query and pay.
+Structured, real-world data. No API keys. No signups. No contracts. Just query and pay.
 
-NexusHub is a **frictionless data marketplace built for AI agents**. Agents discover data hubs, preview records for free, and pay micro-credits ($0.01) for full structured JSON access — all in a single HTTP request.
+NexusHub is a frictionless data marketplace built for AI agents. Agents discover data hubs, preview records for free, and pay micro-credits ($0.01) for full structured JSON access - all in a single HTTP request.
 
 ---
 
@@ -10,77 +10,82 @@ NexusHub is a **frictionless data marketplace built for AI agents**. Agents disc
 
 Most data APIs require OAuth flows, API keys, billing accounts, and contracts. That works for humans. It does not work for autonomous AI agents.
 
-NexusHub works like the open web — but with a toll booth. An agent finds a hub, previews real data, decides it is worth a penny, pays, and gets clean JSON back. No human in the loop required.
+NexusHub works like the open web - but with a toll booth. An agent finds a hub, previews real data, decides it is worth a penny, pays, and gets clean JSON back. No human in the loop required.
 
 ---
 
 ## How It Works
 
-### 1. Discover
-Browse all available data hubs:
-```
-GET https://69fb8e3e95052426110251ae.us-east-1.base44.app/functions/listHubs
-```
-
-Filter by keyword:
-```
-GET .../listHubs?search=contractors
-GET .../listHubs?category=reviews
-```
-
-### 2. Preview (Free — No Token Required)
-```
-GET https://69fb8e3e95052426110251ae.us-east-1.base44.app/functions/queryHub?hub=dfw-contractor-directory
-```
-
-Returns a sample of real records + pricing info. No token needed.
-
-### 3. Query Full Data ($0.01 per query)
-```
-GET https://69fb8e3e95052426110251ae.us-east-1.base44.app/functions/queryHub?hub=dfw-contractor-directory&token=YOUR_TOKEN
-```
-
-Returns full structured JSON. Credits deducted automatically.
+1. Discover - Browse all available data hubs at /listHubs
+2. Preview (Free) - Hit /queryHub?hub=SLUG with no token to get sample records
+3. Query Full Data ($0.01) - Add your token to get full structured JSON
 
 ---
 
 ## Available Data Hubs
 
-| Hub | Description | Price |
-|-----|-------------|-------|
-| `dfw_home_service_reviews` | DFW contractor reviews with ratings, text, and dates | $0.01 |
-| `dfw_contractor_pricing` | HVAC, roofing, plumbing pricing estimates in DFW | $0.01 |
-| `dfw_contractor_directory` | Full DFW contractor directory with contact info and availability | $0.01 |
+Home Services
 
-More hubs added regularly. Browse the full live index:
-```
-GET .../listHubs
-```
+Hub: dfw_home_service_reviews
+Description: DFW contractor reviews with ratings, text, and dates
+Price: $0.01/query
+Endpoint: /queryHub?hub=dfwhomeservicereviews
+
+Hub: dfw_contractor_pricing
+Description: HVAC, roofing, plumbing pricing estimates across DFW
+Price: $0.01/query
+Endpoint: /queryHub?hub=dfw-contractor-pricing
+
+Hub: dfw_contractor_directory
+Description: Full DFW contractor directory with contact info, zip codes, and availability
+Price: $0.01/query
+Endpoint: /queryHub?hub=dfw-contractor-directory
+
+Real Estate
+
+Hub: dfw_home_values
+Description: Median home prices, price/sqft, YoY appreciation by zip code across DFW
+Price: $0.01/query
+Endpoint: /queryHub?hub=dfw-home-values
+
+Hub: dfw_rental_rates
+Description: Average rent by bedroom count and neighborhood across DFW - apartments, townhomes, single-family
+Price: $0.01/query
+Endpoint: /queryHub?hub=dfw-rental-rates
+
+Hub: dfw_permit_activity
+Description: Residential building permit counts, construction values, and growth signals by zip code
+Price: $0.01/query
+Endpoint: /queryHub?hub=dfw-permit-activity
+
+Browse the full live index: https://69fb8e3e95052426110251ae.us-east-1.base44.app/functions/listHubs
 
 ---
 
-## For AI Agents — Quick Start
-
-```python
-import requests
+## For AI Agents - Quick Start
 
 BASE = "https://69fb8e3e95052426110251ae.us-east-1.base44.app/functions"
 
-# Step 1: Discover what is available
+Step 1 - Discover what is available:
+GET {BASE}/listHubs
+
+Step 2 - Preview a hub for free:
+GET {BASE}/queryHub?hub=dfw-home-values
+
+Step 3 - Pay and get full data:
+GET {BASE}/queryHub?hub=dfw-home-values&token=YOUR_TOKEN
+
+Python example:
+import requests
+BASE = "https://69fb8e3e95052426110251ae.us-east-1.base44.app/functions"
 hubs = requests.get(f"{BASE}/listHubs").json()
-
-# Step 2: Preview a hub for free
-preview = requests.get(f"{BASE}/queryHub?hub=dfw-contractor-directory").json()
-
-# Step 3: Pay and get full data
-data = requests.get(f"{BASE}/queryHub?hub=dfw-contractor-directory&token=YOUR_TOKEN").json()
-```
+preview = requests.get(f"{BASE}/queryHub?hub=dfw-home-values").json()
+data = requests.get(f"{BASE}/queryHub?hub=dfw-home-values&token=YOUR_TOKEN").json()
 
 ---
 
-## For LangChain / LangGraph Agents
+## For LangChain Agents
 
-```python
 from langchain.tools import tool
 import requests
 
@@ -89,18 +94,18 @@ NEXUSHUB_TOKEN = "YOUR_TOKEN"
 
 @tool
 def query_nexushub(hub: str) -> dict:
-    """Query NexusHub for structured real-world data. Available hubs: dfw-contractor-directory, dfw-contractor-pricing, dfw_home_service_reviews"""
+    """Query NexusHub for structured real-world DFW data.
+    Available hubs: dfw-home-values, dfw-rental-rates, dfw-permit-activity,
+    dfw-contractor-directory, dfw-contractor-pricing, dfwhomeservicereviews"""
     response = requests.get(f"{BASE}/queryHub?hub={hub}&token={NEXUSHUB_TOKEN}")
     return response.json()
-```
 
 ---
 
-## For Data Providers — List Your Dataset
+## For Data Providers - List Your Dataset
 
-Got data? Submit it to the NexusHub marketplace. You earn **70% of every query** on your dataset.
+Got data? Submit it to the NexusHub marketplace. You earn 70% of every query on your dataset.
 
-```bash
 curl -X POST https://69fb8e3e95052426110251ae.us-east-1.base44.app/functions/submitHub \
   -H "Content-Type: application/json" \
   -d '{
@@ -113,79 +118,36 @@ curl -X POST https://69fb8e3e95052426110251ae.us-east-1.base44.app/functions/sub
     "tags": "tag1,tag2,tag3",
     "price_per_query": 0.01
   }'
-```
 
-Submissions are reviewed and approved within 24 hours.
+Submissions reviewed and approved within 24 hours.
 
 ---
 
 ## API Reference
 
-### `GET /listHubs`
+GET /listHubs
 Returns all available data hubs.
+Params: search (keyword filter), category (e.g. reviews, business, real estate)
 
-**Query params:**
-- `search` — filter by keyword (name, description, tags)
-- `category` — filter by category (e.g. `reviews`, `business`)
+GET /queryHub
+Params: hub (required - the slug), token (optional - omit for free preview)
+Without token: returns 2 sample records + pricing info
+With token: returns full JSON dataset, deducts $0.01 from balance
 
-### `GET /queryHub`
-Preview or query a data hub.
-
-**Query params:**
-- `hub` *(required)* — the hub slug (e.g. `dfw-contractor-directory`)
-- `token` *(optional)* — your credit token. Omit for free preview.
-
-**Response without token:**
-```json
-{
-  "hub": "dfw_contractor_directory",
-  "preview": { "result": [...2 sample records...] },
-  "price_per_query": 0.01,
-  "message": "Preview only. Include a token for full access."
-}
-```
-
-**Response with token:**
-```json
-{
-  "hub": "dfw_contractor_directory",
-  "data": { "result": [...all records...] },
-  "credits_remaining": 9.99
-}
-```
-
-### `POST /submitHub`
+POST /submitHub
 Submit a dataset to the marketplace.
-
-**Body:**
-```json
-{
-  "name": "string (required)",
-  "email": "string (required)",
-  "organization": "string",
-  "dataset_name": "string (required)",
-  "dataset_description": "string (required)",
-  "sample_data": "JSON string (required)",
-  "tags": "comma,separated,tags",
-  "price_per_query": 0.01
-}
-```
+Required fields: name, email, dataset_name, dataset_description, sample_data
+Optional: organization, tags, price_per_query
 
 ---
 
 ## Machine-Readable Index
 
 For AI crawlers and agent frameworks:
-```
-GET https://69fb8e3e95052426110251ae.us-east-1.base44.app/functions/listHubs
-```
+https://69fb8e3e95052426110251ae.us-east-1.base44.app/functions/listHubs
 
 ---
 
-## Topics
+Topics: ai-agents data-marketplace llm-tools langchain autonomous-agents structured-data dfw texas home-services real-estate
 
-`ai-agents` `data-marketplace` `llm-tools` `langchain` `autonomous-agents` `structured-data` `api` `dfw` `texas` `home-services`
-
----
-
-*Built for the agentic web. More hubs added weekly.*
+Built for the agentic web. More hubs added weekly.
